@@ -16,12 +16,12 @@ typedef struct pet_t
 } pet;
 
 // Constructor with default data
-pet pet_new(char *);
+void pet_init(pet *);
 void load_or_create_pet(pet *);
 
 // Persistent data
 int pet_save_to_disk(pet *);
-pet pet_load_from_disk();
+int pet_load_from_disk(pet *);
 int available_pet_list(char ***);
 
 #endif

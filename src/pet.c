@@ -10,21 +10,24 @@
 
 #include "common.h"
 
-pet pet_new(char *name)
+void pet_init(pet *p)
 {
-    pet p = (pet){
-        .name = name,
+    (*p) = (pet){
+        .name = p->name,
         .health = 80,
         .belly = 80,
         .digestion = 0,
         .joy = 80,
         .dirt = 0,
         .birthday = time(0)};
-    return p;
 }
 
 void load_or_create_pet(pet *p)
 {
+    if (pet_load_from_disk(p))
+        return;
+
+    pet_init(p);
 }
 
 static const char *homedir()
@@ -96,13 +99,29 @@ int pet_save_to_disk(pet *p)
     return written;
 }
 
-pet pet_load_from_disk()
+int pet_load_from_disk(pet *p)
 {
     check_and_create_config_directory();
 
-    LOG_ERROR("Not implemented yet!");
+    FILE *file;
+    file = fopen(pet_file(p->name), "rb");
 
-    return pet_new("test");
+    if (file == 0)
+    {
+        LOG_DEBUG("Pet not found.");
+        return 0;
+    }
+
+    fread(&(p->health), sizeof(p->health), 1, file);
+    fread(&(p->belly), sizeof(p->belly), 1, file);
+    fread(&(p->digestion), sizeof(p->digestion), 1, file);
+    fread(&(p->joy), sizeof(p->joy), 1, file);
+    fread(&(p->dirt), sizeof(p->dirt), 1, file);
+    fread(&(p->birthday), sizeof(p->birthday), 1, file);
+
+    fclose(file);
+
+    return 1;
 }
 
 int available_pet_list(char ***list)
@@ -124,6 +143,7 @@ int available_pet_list(char ***list)
 
             char *pet_name = malloc(sizeof(char) * (strlen(dir->d_name) - 3));
             strncpy(pet_name, dir->d_name, strlen(dir->d_name) - 4);
+            pet_name[strlen(dir->d_name) - 3] = '\0';
             LOG_DEBUG("%20s -> %s", dir->d_name, pet_name);
 
             *list = realloc(*list, (count + 1) * sizeof(char *));

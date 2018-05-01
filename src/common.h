@@ -13,8 +13,8 @@
 #define INFO_TAG    "INFO"
 #define DEBUG_TAG   "DEBUG"
 
-#define LOG_FMT "%s | %-7s | %-15s | %s:%d | "
-#define NEWLINE "\n"
+#define LOG_FMT "\x1B[34m%s | %-7s | %-15s | %s:%d | "
+#define NEWLINE "\x1B[0m\n"
 
 #ifndef LOG_LEVEL
 #define LOG_LEVEL ERROR_LEVEL
